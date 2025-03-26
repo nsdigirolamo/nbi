@@ -2,7 +2,22 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-int main(int argc, char *argv[])
+typedef enum
+{
+    RIGHT,
+    LEFT,
+    INCREMENT,
+    DECREMENT,
+    OUTPUT,
+    INPUT,
+    LOOP_START,
+    LOOP_END,
+    NOP,
+} Instruction;
+
+Instruction getNextInstruction(char symbol);
+
+int main(int argc, char **argv)
 {
     if (argc < 1)
     {
@@ -12,6 +27,7 @@ int main(int argc, char *argv[])
 
     char const *const fileName = argv[1];
     FILE *file = fopen(fileName, "r");
+    long fileSize;
 
     if (file == NULL)
     {
@@ -19,15 +35,83 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    char *line = NULL;
-    size_t length = 0;
-    ssize_t read;
+    int status = fseek(file, 0, SEEK_END);
 
-    while ((read = getline(&line, &length, file)) != -1)
+    if (status == -1)
     {
-        printf("%d %s\n", read, line);
+        printf("Failed to find end of file.\n");
+        exit(EXIT_FAILURE);
     }
 
-    free(line);
+    fileSize = ftell(file);
+
+    if (fileSize == -1)
+    {
+        printf("Failed to find size of file.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    status = fseek(file, 0, SEEK_SET);
+
+    if (status == -1)
+    {
+        printf("Failed to reset file position.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    char *fileContents = malloc(fileSize);
+
+    if (fileContents == NULL)
+    {
+        printf("Failed to allocate space for program file.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    size_t readCount = fread(fileContents, 1, fileSize, file);
+
+    if (readCount != fileSize)
+    {
+        printf("Failed to read program file.\n");
+        free(fileContents);
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; fileContents[i] != '\0'; ++i)
+    {
+        char nextChar = fileContents[i];
+        Instruction nextInstruction = getNextInstruction(nextChar);
+        if (nextInstruction != NOP)
+        {
+            printf("%d ", nextInstruction);
+        }
+        printf("\n");
+    }
+
+    free(fileContents);
     exit(EXIT_SUCCESS);
+}
+
+Instruction getNextInstruction(char symbol)
+{
+    switch (symbol)
+    {
+    case '>':
+        return RIGHT;
+    case '<':
+        return LEFT;
+    case '+':
+        return INCREMENT;
+    case '-':
+        return DECREMENT;
+    case '.':
+        return OUTPUT;
+    case ',':
+        return INPUT;
+    case '[':
+        return LOOP_START;
+    case ']':
+        return LOOP_END;
+    default:
+        return NOP;
+    }
 }
