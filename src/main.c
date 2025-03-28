@@ -7,8 +7,6 @@
 
 const size_t CELL_COUNT = 30000;
 
-char *getFileContents(char const *const fileName);
-
 int main(int argc, char **argv)
 {
     if (argc < 1)
