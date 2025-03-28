@@ -1,5 +1,6 @@
 # Generated Files
-out
+objs
+nbi
 
 # Configuration Files
 .vscode

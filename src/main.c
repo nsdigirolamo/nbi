@@ -1,21 +1,13 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdint.h>
 
-typedef enum
-{
-    RIGHT,
-    LEFT,
-    INCREMENT,
-    DECREMENT,
-    OUTPUT,
-    INPUT,
-    LOOP_START,
-    LOOP_END,
-    NOP,
-} Instruction;
+#include "instructions.h"
 
-Instruction getNextInstruction(char symbol);
+const size_t CELL_COUNT = 30000;
+
+char *getFileContents(char const *const fileName);
 
 int main(int argc, char **argv)
 {
@@ -69,7 +61,7 @@ int main(int argc, char **argv)
 
     size_t readCount = fread(fileContents, 1, fileSize, file);
 
-    if (readCount != fileSize)
+    if ((long)(readCount) != fileSize)
     {
         printf("Failed to read program file.\n");
         free(fileContents);
@@ -82,36 +74,11 @@ int main(int argc, char **argv)
         Instruction nextInstruction = getNextInstruction(nextChar);
         if (nextInstruction != NOP)
         {
-            printf("%d ", nextInstruction);
+            printf("%s ", InstructionToString(nextInstruction));
         }
         printf("\n");
     }
 
     free(fileContents);
     exit(EXIT_SUCCESS);
-}
-
-Instruction getNextInstruction(char symbol)
-{
-    switch (symbol)
-    {
-    case '>':
-        return RIGHT;
-    case '<':
-        return LEFT;
-    case '+':
-        return INCREMENT;
-    case '-':
-        return DECREMENT;
-    case '.':
-        return OUTPUT;
-    case ',':
-        return INPUT;
-    case '[':
-        return LOOP_START;
-    case ']':
-        return LOOP_END;
-    default:
-        return NOP;
-    }
 }
