@@ -8,9 +8,14 @@
 typedef struct
 {
     const Instruction *const instructions;
+    unsigned int instructionPointer;
     uint8_t *cells;
-    size_t pointer;
+    unsigned int cellPointer;
 } State;
+
+Instruction getCurrentInstruction(State *state);
+uint8_t getCurrentCell(State *state);
+void setCurrentCell(State *state, uint8_t newValue);
 
 void doRight(State *state);
 void doLeft(State *state);
