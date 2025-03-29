@@ -40,7 +40,7 @@ int main(int argc, char **argv)
 char *getFileContents(char const *const filePath)
 {
     FILE *file = fopen(filePath, "r");
-    long fileSize;
+    size_t fileSize;
 
     if (file == NULL)
     {
@@ -56,14 +56,15 @@ char *getFileContents(char const *const filePath)
         exit(EXIT_FAILURE);
     }
 
-    fileSize = ftell(file);
+    const long filePosition = ftell(file);
 
-    if (fileSize == -1)
+    if (filePosition == -1)
     {
         printf("Failed to find size of file.\n");
         exit(EXIT_FAILURE);
     }
 
+    fileSize = filePosition;
     status = fseek(file, 0, SEEK_SET);
 
     if (status == -1)
@@ -80,9 +81,10 @@ char *getFileContents(char const *const filePath)
         exit(EXIT_FAILURE);
     }
 
-    size_t readCount = fread(fileContents, 1, fileSize, file);
+    const size_t itemSize = 1;
+    const size_t readCount = fread(fileContents, itemSize, fileSize, file);
 
-    if ((long)(readCount) != fileSize)
+    if ((readCount * itemSize) != fileSize)
     {
         printf("Failed to read program file.\n");
         free(fileContents);
