@@ -8,6 +8,7 @@
 const size_t CELL_COUNT = 30000;
 
 char *getFileContents(char const *const filePath);
+Instruction *getInstructions(char *fileContents);
 
 int main(int argc, char **argv)
 {
@@ -19,25 +20,22 @@ int main(int argc, char **argv)
 
     char const *const filePath = argv[1];
     char *fileContents = getFileContents(filePath);
+    Instruction *instructions = getInstructions(fileContents);
 
-    for (int i = 0; fileContents[i] != '\0'; ++i)
+    for (int i = 0; instructions[i] != HALT; ++i)
     {
-        char nextChar = fileContents[i];
-        Instruction nextInstruction = getNextInstruction(nextChar);
-        if (nextInstruction != NOP)
-        {
-            printf("%s ", InstructionToString(nextInstruction));
-        }
-        printf("\n");
+        Instruction instruction = instructions[i];
+        printf("%s ", instructionToString(instruction));
     }
 
     free(fileContents);
+    free(instructions);
     exit(EXIT_SUCCESS);
 }
 
 /**
- * Returns the contents of a file at the given path. Exits with `EXIT_FAILURE`
- * upon error.
+ * Returns a pointer to the contents of a file at the given path. The returned
+ * pointer must be freed by the caller. Exits with `EXIT_FAILURE` upon error.
  */
 char *getFileContents(char const *const filePath)
 {
@@ -92,4 +90,41 @@ char *getFileContents(char const *const filePath)
     }
 
     return fileContents;
+}
+
+/**
+ * Returns a pointer to an array of instructions. This array will always end
+ * with a `HALT`. The returned pointer must be freed by the caller. Exits with
+ * `EXIT_FAILURE` upon error.
+ */
+Instruction *getInstructions(char *fileContents)
+{
+    int instructionCount = 128;
+    Instruction *instructions = (Instruction *)(malloc(instructionCount * sizeof(Instruction)));
+
+    if (instructions == NULL)
+    {
+        printf("Failed to allocate space for instructions.");
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; fileContents[i] != '\0'; ++i)
+    {
+        char nextChar = fileContents[i];
+        Instruction nextInstruction = charToInstruction(nextChar);
+        instructions[i] = nextInstruction;
+
+        if (i + 1 == instructionCount)
+        {
+            instructionCount *= 2;
+            instructions = realloc(instructions, instructionCount * sizeof(Instruction));
+        }
+
+        if (fileContents[i + 1] == '\0')
+        {
+            instructions[i + 1] = HALT;
+        }
+    }
+
+    return instructions;
 }

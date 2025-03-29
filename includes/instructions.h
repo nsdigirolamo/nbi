@@ -11,10 +11,11 @@ typedef enum
     INPUT,
     LOOP_START,
     LOOP_END,
+    HALT,
     NOP,
 } Instruction;
 
-Instruction getNextInstruction(char symbol);
-char *InstructionToString(Instruction instruction);
+Instruction charToInstruction(char symbol);
+char *instructionToString(Instruction instruction);
 
 #endif

@@ -1,8 +1,8 @@
 #include "instructions.h"
 
-Instruction getNextInstruction(char symbol)
+Instruction charToInstruction(char character)
 {
-    switch (symbol)
+    switch (character)
     {
     case '>':
         return RIGHT;
@@ -25,7 +25,7 @@ Instruction getNextInstruction(char symbol)
     }
 }
 
-char *InstructionToString(Instruction instruction)
+char *instructionToString(Instruction instruction)
 {
     switch (instruction)
     {
