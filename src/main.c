@@ -7,6 +7,8 @@
 
 const size_t CELL_COUNT = 30000;
 
+char *getFileContents(char const *const filePath);
+
 int main(int argc, char **argv)
 {
     if (argc < 1)
@@ -15,8 +17,31 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    char const *const fileName = argv[1];
-    FILE *file = fopen(fileName, "r");
+    char const *const filePath = argv[1];
+    char *fileContents = getFileContents(filePath);
+
+    for (int i = 0; fileContents[i] != '\0'; ++i)
+    {
+        char nextChar = fileContents[i];
+        Instruction nextInstruction = getNextInstruction(nextChar);
+        if (nextInstruction != NOP)
+        {
+            printf("%s ", InstructionToString(nextInstruction));
+        }
+        printf("\n");
+    }
+
+    free(fileContents);
+    exit(EXIT_SUCCESS);
+}
+
+/**
+ * Returns the contents of a file at the given path. Exits with `EXIT_FAILURE`
+ * upon error.
+ */
+char *getFileContents(char const *const filePath)
+{
+    FILE *file = fopen(filePath, "r");
     long fileSize;
 
     if (file == NULL)
@@ -66,17 +91,5 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    for (int i = 0; fileContents[i] != '\0'; ++i)
-    {
-        char nextChar = fileContents[i];
-        Instruction nextInstruction = getNextInstruction(nextChar);
-        if (nextInstruction != NOP)
-        {
-            printf("%s ", InstructionToString(nextInstruction));
-        }
-        printf("\n");
-    }
-
-    free(fileContents);
-    exit(EXIT_SUCCESS);
+    return fileContents;
 }
