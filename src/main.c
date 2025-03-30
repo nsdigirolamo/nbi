@@ -70,6 +70,7 @@ int main(int argc, char **argv)
         };
     }
 
+    free(cells);
     free(fileContents);
     free(instructions);
     exit(EXIT_SUCCESS);
@@ -129,7 +130,14 @@ char *getFileContents(char const *const filePath)
     if ((readCount * itemSize) != fileSize)
     {
         printf("Failed to read program file.\n");
-        free(fileContents);
+        exit(EXIT_FAILURE);
+    }
+
+    status = fclose(file);
+
+    if (status != 0)
+    {
+        printf("Failed to close file.\n");
         exit(EXIT_FAILURE);
     }
 
