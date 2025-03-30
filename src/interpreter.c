@@ -21,6 +21,15 @@ void setCurrentCell(State *state, uint8_t newValue)
     state->cells[state->cellPointer] = newValue;
 }
 
+void printState(State *state)
+{
+    Instruction currentInstruction = getCurrentInstruction(state);
+    uint8_t currentCellValue = getCurrentCell(state);
+    printf("Instruction: %9s %d\n", instructionToString(currentInstruction), state->instructionPointer);
+    printf("Cell       : %9d %d\n", currentCellValue, state->cellPointer);
+    fflush(stdout);
+}
+
 void doRight(State *state)
 {
     state->cellPointer += 1;

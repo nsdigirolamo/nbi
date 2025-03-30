@@ -32,9 +32,9 @@ int main(int argc, char **argv)
         0,
     };
 
-    for (int charIndex = 0; instructions[charIndex] != HALT; ++charIndex)
+    for (; instructions[state.instructionPointer] != HALT; ++state.instructionPointer)
     {
-        Instruction instruction = instructions[charIndex];
+        Instruction instruction = instructions[state.instructionPointer];
 
         switch (instruction)
         {

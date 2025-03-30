@@ -16,6 +16,7 @@ typedef struct
 Instruction getCurrentInstruction(State *state);
 uint8_t getCurrentCell(State *state);
 void setCurrentCell(State *state, uint8_t newValue);
+void printState(State *state);
 
 void doRight(State *state);
 void doLeft(State *state);

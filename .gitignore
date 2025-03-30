@@ -1,6 +1,7 @@
 # Generated Files
 objs
 nbi
+vgcore.*
 
 # Configuration Files
 .vscode
