@@ -70,8 +70,6 @@ int main(int argc, char **argv)
         };
     }
 
-    printf("\n");
-
     free(fileContents);
     free(instructions);
     exit(EXIT_SUCCESS);
