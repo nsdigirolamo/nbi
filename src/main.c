@@ -116,7 +116,8 @@ char *getFileContents(char const *const filePath)
         exit(EXIT_FAILURE);
     }
 
-    char *fileContents = malloc(fileSize);
+    char *fileContents = malloc(fileSize + 1);
+    fileContents[fileSize] = '\0';
 
     if (fileContents == NULL)
     {
@@ -177,7 +178,13 @@ Instruction *getInstructions(char *fileContents)
         if (instructionIndex == maxInstructionCount)
         {
             maxInstructionCount *= 2;
-            instructions = realloc(instructions, maxInstructionCount * sizeof(Instruction));
+            Instruction *temp = realloc(instructions, maxInstructionCount * sizeof(Instruction));
+            if (temp == NULL)
+            {
+                printf("FAiled to reallocate space for instructions.\n");
+                exit(EXIT_FAILURE);
+            }
+            instructions = temp;
         }
     }
 
