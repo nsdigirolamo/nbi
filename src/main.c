@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "instructions.h"
+#include "interpreter.h"
 
 const size_t CELL_COUNT = 30000;
 
@@ -22,11 +23,59 @@ int main(int argc, char **argv)
     char *fileContents = getFileContents(filePath);
     Instruction *instructions = getInstructions(fileContents);
 
-    for (int i = 0; instructions[i] != HALT; ++i)
+    uint8_t *cells = (uint8_t *)(calloc(CELL_COUNT, sizeof(uint8_t)));
+
+    State state = {
+        instructions,
+        0,
+        cells,
+        0,
+    };
+
+    for (int charIndex = 0; instructions[charIndex] != HALT; ++charIndex)
     {
-        Instruction instruction = instructions[i];
-        printf("%s ", instructionToString(instruction));
+        Instruction instruction = instructions[charIndex];
+
+        switch (instruction)
+        {
+        case RIGHT:
+            doRight(&state);
+            break;
+
+        case LEFT:
+            doLeft(&state);
+            break;
+
+        case INCREMENT:
+            doIncrement(&state);
+            break;
+
+        case DECREMENT:
+            doDecrement(&state);
+            break;
+
+        case OUTPUT:
+            doOutput(&state);
+            break;
+
+        case INPUT:
+            doInput(&state);
+            break;
+
+        case LOOP_START:
+            doLoopStart(&state);
+            break;
+
+        case LOOP_END:
+            doLoopEnd(&state);
+            break;
+
+        default:
+            break;
+        };
     }
+
+    printf("\n");
 
     free(fileContents);
     free(instructions);
@@ -101,8 +150,9 @@ char *getFileContents(char const *const filePath)
  */
 Instruction *getInstructions(char *fileContents)
 {
-    int instructionCount = 128;
-    Instruction *instructions = (Instruction *)(malloc(instructionCount * sizeof(Instruction)));
+    int instructionIndex = 0;
+    int maxInstructionCount = 128;
+    Instruction *instructions = (Instruction *)(malloc(maxInstructionCount * sizeof(Instruction)));
 
     if (instructions == NULL)
     {
@@ -110,23 +160,27 @@ Instruction *getInstructions(char *fileContents)
         exit(EXIT_FAILURE);
     }
 
-    for (int i = 0; fileContents[i] != '\0'; ++i)
+    for (int charIndex = 0; fileContents[charIndex] != '\0'; ++charIndex)
     {
-        char nextChar = fileContents[i];
+        char nextChar = fileContents[charIndex];
         Instruction nextInstruction = charToInstruction(nextChar);
-        instructions[i] = nextInstruction;
 
-        if (i + 1 == instructionCount)
+        if (nextInstruction == NOP)
         {
-            instructionCount *= 2;
-            instructions = realloc(instructions, instructionCount * sizeof(Instruction));
+            continue;
         }
 
-        if (fileContents[i + 1] == '\0')
+        instructions[instructionIndex] = nextInstruction;
+        ++instructionIndex;
+
+        if (instructionIndex == maxInstructionCount)
         {
-            instructions[i + 1] = HALT;
+            maxInstructionCount *= 2;
+            instructions = realloc(instructions, maxInstructionCount * sizeof(Instruction));
         }
     }
+
+    instructions[instructionIndex] = HALT;
 
     return instructions;
 }
