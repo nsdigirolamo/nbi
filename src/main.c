@@ -22,21 +22,16 @@ int main(int argc, char **argv)
     char const *const filePath = argv[1];
     char *fileContents = getFileContents(filePath);
     Instruction *instructions = getInstructions(fileContents);
+    unsigned int instructionPointer = 0;
 
     uint8_t *cells = (uint8_t *)(calloc(CELL_COUNT, sizeof(uint8_t)));
+    unsigned int cellPointer = 0;
 
-    State state = {
-        instructions,
-        0,
-        cells,
-        0,
-    };
+    State state = {instructions, instructionPointer, cells, cellPointer};
 
-    for (; instructions[state.instructionPointer] != HALT; ++state.instructionPointer)
+    for (; getCurrentInstruction(&state) != HALT; ++state.instructionPointer)
     {
-        Instruction instruction = instructions[state.instructionPointer];
-
-        switch (instruction)
+        switch (getCurrentInstruction(&state))
         {
         case RIGHT:
             doRight(&state);
